@@ -29,12 +29,7 @@ function init() {
     loadBackground();
     renderTasks();
     switchMode('pomodoro');
-
-    const headerTitle = document.querySelector('header h1');
-const savedName = localStorage.getItem('focusUserName');
-if (savedName) {
-    headerTitle.textContent = `FocusFlow — ${savedName}'s Session`;
-}
+    loadOptionalWelcome();
 }
 
 
@@ -228,62 +223,42 @@ document.getElementById('save-task').addEventListener('click', addTask);
 
 init();
 
-// --- Welcome Celebration Logic ---
-const welcomeModal = document.getElementById('welcome-modal');
-const startWelcomeBtn = document.getElementById('start-welcome');
-const nameInput = document.getElementById('user-name-input');
-const celebrationArea = document.getElementById('celebration-area');
-const welcomeMessage = document.getElementById('welcome-message');
+// --- Minimal Optional Welcome Feature ---
+const optionalNameInput = document.getElementById('optional-user-name');
+const optionalWelcomeText = document.getElementById('optional-welcome-text');
 
-function generateMessage(name) {
-    const messages = [
-        `Welcome, ${name}! 🌸 Time to focus like a legend.`,
-        `${name}, today you're unstoppable 🚀`,
-        `Let’s build something powerful, ${name}!`,
-        `${name}, your productivity era starts now ✨`
-    ];
-    return messages[Math.floor(Math.random() * messages.length)];
+function generateProfessionalGreeting(name) {
+    const hour = new Date().getHours();
+    let greeting = "Hello";
+
+    if (hour < 12) greeting = "Good Morning";
+    else if (hour < 18) greeting = "Good Afternoon";
+    else greeting = "Good Evening";
+
+    return `${greeting}, ${name}. Stay focused and make this session count.`;
 }
 
-function createPetals() {
-    for (let i = 0; i < 20; i++) {
-        const petal = document.createElement('div');
-        petal.className = 'petal';
-        petal.innerHTML = '🌸';
-        petal.style.left = Math.random() * 100 + 'vw';
-        petal.style.animationDuration = (Math.random() * 3 + 2) + 's';
-        document.body.appendChild(petal);
-
-        setTimeout(() => petal.remove(), 5000);
+function loadOptionalWelcome() {
+    const savedName = localStorage.getItem('optionalFocusName');
+    if (savedName) {
+        optionalNameInput.value = savedName;
+        optionalWelcomeText.textContent = generateProfessionalGreeting(savedName);
+        optionalWelcomeText.classList.remove('hide');
+        optionalWelcomeText.classList.add('show');
     }
 }
 
-startWelcomeBtn.addEventListener('click', () => {
-    const name = nameInput.value.trim();
-    if (!name) return;
+optionalNameInput.addEventListener('input', () => {
+    const name = optionalNameInput.value.trim();
 
-    localStorage.setItem('focusUserName', name);
-
-    celebrationArea.classList.remove('hidden');
-    welcomeMessage.textContent = generateMessage(name);
-
-    createPetals();
-
-    confetti({
-        particleCount: 120,
-        spread: 70,
-        origin: { y: 0.6 }
-    });
-
-    setTimeout(() => {
-        welcomeModal.classList.add('hidden');
-    }, 4000);
-});
-
-// Auto skip if already entered name
-window.addEventListener('load', () => {
-    const savedName = localStorage.getItem('focusUserName');
-    if (savedName) {
-        welcomeModal.classList.add('hidden');
+    if (name.length > 0) {
+        localStorage.setItem('optionalFocusName', name);
+        optionalWelcomeText.textContent = generateProfessionalGreeting(name);
+        optionalWelcomeText.classList.remove('hide');
+        optionalWelcomeText.classList.add('show');
+    } else {
+        localStorage.removeItem('optionalFocusName');
+        optionalWelcomeText.classList.remove('show');
+        optionalWelcomeText.classList.add('hide');
     }
 });
