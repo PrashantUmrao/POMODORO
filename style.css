@@ -66,26 +66,3 @@
 
 }
 
-/* Optional Welcome Card Styling */
-#welcome-card {
-    transition: all 0.4s ease;
-}
-
-#welcome-card input:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.3);
-}
-
-#welcome-card p {
-    transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-#welcome-card p.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-#welcome-card p.hide {
-    opacity: 0;
-    transform: translateY(5px);
-}
