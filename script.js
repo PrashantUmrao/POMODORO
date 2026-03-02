@@ -29,7 +29,7 @@ function init() {
     loadBackground();
     renderTasks();
     switchMode('pomodoro');
-    loadOptionalWelcome();
+   
 }
 
 
@@ -223,42 +223,5 @@ document.getElementById('save-task').addEventListener('click', addTask);
 
 init();
 
-// --- Minimal Optional Welcome Feature ---
-const optionalNameInput = document.getElementById('optional-user-name');
-const optionalWelcomeText = document.getElementById('optional-welcome-text');
 
-function generateProfessionalGreeting(name) {
-    const hour = new Date().getHours();
-    let greeting = "Hello";
 
-    if (hour < 12) greeting = "Good Morning";
-    else if (hour < 18) greeting = "Good Afternoon";
-    else greeting = "Good Evening";
-
-    return `${greeting}, ${name}. Stay focused and make this session count.`;
-}
-
-function loadOptionalWelcome() {
-    const savedName = localStorage.getItem('optionalFocusName');
-    if (savedName) {
-        optionalNameInput.value = savedName;
-        optionalWelcomeText.textContent = generateProfessionalGreeting(savedName);
-        optionalWelcomeText.classList.remove('hide');
-        optionalWelcomeText.classList.add('show');
-    }
-}
-
-optionalNameInput.addEventListener('input', () => {
-    const name = optionalNameInput.value.trim();
-
-    if (name.length > 0) {
-        localStorage.setItem('optionalFocusName', name);
-        optionalWelcomeText.textContent = generateProfessionalGreeting(name);
-        optionalWelcomeText.classList.remove('hide');
-        optionalWelcomeText.classList.add('show');
-    } else {
-        localStorage.removeItem('optionalFocusName');
-        optionalWelcomeText.classList.remove('show');
-        optionalWelcomeText.classList.add('hide');
-    }
-});
