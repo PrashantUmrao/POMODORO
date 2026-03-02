@@ -29,7 +29,14 @@ function init() {
     loadBackground();
     renderTasks();
     switchMode('pomodoro');
+
+    const headerTitle = document.querySelector('header h1');
+const savedName = localStorage.getItem('focusUserName');
+if (savedName) {
+    headerTitle.textContent = `FocusFlow — ${savedName}'s Session`;
 }
+}
+
 
 // --- Timer Logic ---
 function updateTimer() {
@@ -218,4 +225,65 @@ document.getElementById('cancel-task').addEventListener('click', () => taskInput
 document.getElementById('save-task').addEventListener('click', addTask);
 
 // Start
+
 init();
+
+// --- Welcome Celebration Logic ---
+const welcomeModal = document.getElementById('welcome-modal');
+const startWelcomeBtn = document.getElementById('start-welcome');
+const nameInput = document.getElementById('user-name-input');
+const celebrationArea = document.getElementById('celebration-area');
+const welcomeMessage = document.getElementById('welcome-message');
+
+function generateMessage(name) {
+    const messages = [
+        `Welcome, ${name}! 🌸 Time to focus like a legend.`,
+        `${name}, today you're unstoppable 🚀`,
+        `Let’s build something powerful, ${name}!`,
+        `${name}, your productivity era starts now ✨`
+    ];
+    return messages[Math.floor(Math.random() * messages.length)];
+}
+
+function createPetals() {
+    for (let i = 0; i < 20; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'petal';
+        petal.innerHTML = '🌸';
+        petal.style.left = Math.random() * 100 + 'vw';
+        petal.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        document.body.appendChild(petal);
+
+        setTimeout(() => petal.remove(), 5000);
+    }
+}
+
+startWelcomeBtn.addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    if (!name) return;
+
+    localStorage.setItem('focusUserName', name);
+
+    celebrationArea.classList.remove('hidden');
+    welcomeMessage.textContent = generateMessage(name);
+
+    createPetals();
+
+    confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.6 }
+    });
+
+    setTimeout(() => {
+        welcomeModal.classList.add('hidden');
+    }, 4000);
+});
+
+// Auto skip if already entered name
+window.addEventListener('load', () => {
+    const savedName = localStorage.getItem('focusUserName');
+    if (savedName) {
+        welcomeModal.classList.add('hidden');
+    }
+});
