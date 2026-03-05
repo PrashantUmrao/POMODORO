@@ -11,6 +11,14 @@ let timerData = {
 
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
+let stats = JSON.parse(localStorage.getItem("stats")) || {
+    sessionsToday: 0,
+    totalSessions: 0,
+    streak: 0,
+    lastDate: null,
+    weekly: [0,0,0,0,0,0,0]
+};
+
 // --- DOM Elements ---
 const body = document.body;
 const timerDisplay = document.getElementById('timer-display');
@@ -29,6 +37,7 @@ function init() {
     loadBackground();
     renderTasks();
     switchMode('pomodoro');
+    updateDashboard();
    
 }
 
@@ -50,12 +59,17 @@ function updateTimer() {
     document.title = `${timerDisplay.textContent} - FocusFlow`;
 
     if (timerData.timeLeft === 0) {
-        clearInterval(timerData.interval);
-        finishSound.play();
-        timerData.isActive = false;
-        startBtn.textContent = 'START';
-        alert('Time is up!');
-    } else {
+    clearInterval(timerData.interval);
+    finishSound.play();
+    timerData.isActive = false;
+    startBtn.textContent = 'START';
+
+    // NEW FEATURES
+    updateStats();       // updates session count
+    showNotification();  // desktop notification
+
+    alert('Time is up!');
+} else {
         timerData.timeLeft--;
     }
 }
@@ -191,37 +205,128 @@ function saveSettings() {
     
     switchMode(timerData.currentMode); // Reset with new times
 }
-
-// --- Event Listeners ---
-startBtn.addEventListener('click', toggleTimer);
-skipBtn.addEventListener('click', () => {
-    const modes = ['pomodoro', 'short', 'long'];
-    let nextIndex = (modes.indexOf(timerData.currentMode) + 1) % modes.length;
-    switchMode(modes[nextIndex]);
-});
-
-modeBtns.forEach(btn => {
-    btn.addEventListener('click', () => switchMode(btn.dataset.mode));
-});
-
-// Modal Toggles
-document.getElementById('settings-btn').addEventListener('click', () => document.getElementById('settings-modal').classList.remove('hidden'));
-document.getElementById('close-settings').addEventListener('click', () => {
-    saveSettings();
-    document.getElementById('settings-modal').classList.add('hidden');
-});
-
-document.getElementById('personalize-btn').addEventListener('click', () => document.getElementById('personalize-modal').classList.remove('hidden'));
-document.getElementById('close-personalize').addEventListener('click', () => document.getElementById('personalize-modal').classList.add('hidden'));
-
-// Task UI Toggles
-document.getElementById('add-task-btn').addEventListener('click', () => taskInputContainer.classList.toggle('hidden'));
-document.getElementById('cancel-task').addEventListener('click', () => taskInputContainer.classList.add('hidden'));
-document.getElementById('save-task').addEventListener('click', addTask);
-
-// Start
+        
+        // --- Event Listeners ---
+        startBtn.addEventListener('click', toggleTimer);
+        skipBtn.addEventListener('click', () => {
+            const modes = ['pomodoro', 'short', 'long'];
+            let nextIndex = (modes.indexOf(timerData.currentMode) + 1) % modes.length;
+            switchMode(modes[nextIndex]);
+        });
+        
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+        });
+        
+        // Modal Toggles
+        document.getElementById('settings-btn').addEventListener('click', () => document.getElementById('settings-modal').classList.remove('hidden'));
+        document.getElementById('close-settings').addEventListener('click', () => {
+            saveSettings();
+            document.getElementById('settings-modal').classList.add('hidden');
+        });
+        
+        document.getElementById('personalize-btn').addEventListener('click', () => document.getElementById('personalize-modal').classList.remove('hidden'));
+        document.getElementById('close-personalize').addEventListener('click', () => document.getElementById('personalize-modal').classList.add('hidden'));
+        
+        // Task UI Toggles
+        document.getElementById('add-task-btn').addEventListener('click', () => taskInputContainer.classList.toggle('hidden'));
+        document.getElementById('cancel-task').addEventListener('click', () => taskInputContainer.classList.add('hidden'));
+        document.getElementById('save-task').addEventListener('click', addTask);
+        
+        // Start
+        function updateStats(){
+        
+            const today = new Date().toDateString();
+        
+            if(stats.lastDate !== today){
+                stats.sessionsToday = 0;
+            }
+        
+            stats.sessionsToday++;
+            stats.totalSessions++;
+        
+            if(stats.lastDate !== today){
+                stats.streak++;
+            }
+        
+            stats.lastDate = today;
+        
+            const day = new Date().getDay();
+            stats.weekly[day]++;
+        
+            localStorage.setItem("stats",JSON.stringify(stats));
+        
+            updateDashboard();
+        }
+        
+        function updateDashboard(){
+        
+            document.getElementById("sessions-today").textContent = stats.sessionsToday;
+        
+            document.getElementById("focus-streak").textContent = stats.streak;
+        
+            const score = stats.sessionsToday * 10;
+        
+            document.getElementById("productivity-score").textContent = score;
+        
+            drawChart();
+        }
+        
+        let chart;
+        
+        function drawChart(){
+        
+        const ctx = document.getElementById("focusChart");
+        
+        if(chart){
+        chart.destroy();
+        }
+        
+        chart = new Chart(ctx,{
+        type:"bar",
+        data:{
+        labels:["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],
+        datasets:[{
+        label:"Focus Sessions",
+        data:stats.weekly
+        }]
+        }
+        });
+        }
+        
+        function showNotification(){
+        
+        if(Notification.permission !== "granted"){
+        Notification.requestPermission();
+        }
+        
+        if(Notification.permission === "granted"){
+        new Notification("Pomodoro Completed!",{
+        body:"Take a break and recharge!"
+        });
+        }
+        }
+        
+        const rainSound = document.getElementById("rain-sound");
+        
+        document.getElementById("sound-toggle").addEventListener("click",()=>{
+        
+        if(rainSound.paused){
+        rainSound.play();
+        }else{
+        rainSound.pause();
+        }
+        
+        });
+        
+        document.getElementById("theme-toggle").addEventListener("click",()=>{
+        
+        document.body.classList.toggle("bg-gray-900");
+        
+        });
 
 init();
+
 
 
 
