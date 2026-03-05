@@ -66,3 +66,82 @@
 
 }
 
+/* ---------- Productivity Dashboard ---------- */
+
+.dashboard-card{
+    margin-top: 25px;
+}
+
+.dashboard-grid{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 15px;
+    text-align: center;
+}
+
+.dashboard-item{
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.15);
+}
+
+.dashboard-item h3{
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.dashboard-item p{
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* ---------- Chart Styling ---------- */
+
+#focusChart{
+    margin-top: 20px;
+    max-height: 200px;
+}
+
+/* ---------- Timer Controls ---------- */
+
+.timer-controls{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+#sound-toggle{
+    font-size: 14px;
+}
+
+/* ---------- Task Section ---------- */
+
+#task-list{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* ---------- Mobile Fix ---------- */
+
+@media(max-width:640px){
+
+.dashboard-grid{
+grid-template-columns:1fr;
+}
+
+#timer-display{
+font-size:60px;
+}
+
+}
+
+
