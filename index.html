@@ -1,39 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FocusFlow | Premium Pomodoro Timer</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        body { font-family: 'Inter', sans-serif; transition: background-color 0.5s ease; }
-        .glass { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
-    </style>
+    <!-- Chart.js for Productivity Chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
-<body class="bg-red-500 min-h-screen flex flex-col items-center py-8 px-4 relative overflow-x-hidden">
+<body class="bg-red-500 min-h-screen flex flex-col items-center py-8 px-4 relative overflow-x-hidden transition-colors duration-500">
     
     <!-- Background Overlay for Personalization -->
     <div id="bg-overlay" class="fixed inset-0 z-[-1] bg-cover bg-center transition-opacity duration-700"></div>
     <div id="color-overlay" class="fixed inset-0 z-[-2] transition-colors duration-500"></div>
 
-    <header class="w-full max-w-xl flex justify-between items-center mb-8 z-10">
+    <header class="w-full max-w-2xl flex justify-between items-center mb-8 z-10 flex-wrap gap-4">
         <h1 class="text-white text-2xl font-bold tracking-tight">FocusFlow</h1>
-        <div class="flex gap-2">
-            <button id="personalize-btn" class="glass text-white px-4 py-2 rounded-md text-sm hover:bg-white/30 transition">Personalize</button>
-            <button id="settings-btn" class="glass text-white px-4 py-2 rounded-md text-sm hover:bg-white/30 transition">Settings</button>
+        <div class="flex gap-2 items-center flex-wrap">
+            <!-- Focus Sounds Selector -->
+            <select id="ambient-sound-selector" class="glass text-white px-3 py-2 rounded-md text-sm outline-none cursor-pointer">
+                <option class="text-black" value="none">🔇 No Sound</option>
+                <option class="text-black" value="rain">🌧️ Rain</option>
+                <option class="text-black" value="forest">🌲 Forest</option>
+                <option class="text-black" value="cafe">☕ Cafe</option>
+            </select>
+            <button id="stats-btn" class="glass text-white px-4 py-2 rounded-md text-sm hover:bg-white/30 transition">📊 Stats</button>
+            <button id="theme-toggle" class="glass text-white px-4 py-2 rounded-md text-sm hover:bg-white/30 transition">🌙</button>
+            <button id="personalize-btn" class="glass text-white px-4 py-2 rounded-md text-sm hover:bg-white/30 transition">🎨</button>
+            <button id="settings-btn" class="glass text-white px-4 py-2 rounded-md text-sm hover:bg-white/30 transition">⚙️</button>
         </div>
-        <button id="theme-toggle" class="glass text-white px-4 py-2 rounded-md text-sm">Theme</button>
     </header>
 
     <main class="w-full max-w-xl z-10">
         <!-- Timer Card -->
-        <div class="glass rounded-xl p-8 text-center shadow-2xl mb-6">
+        <div class="glass dark-glass rounded-xl p-8 text-center shadow-2xl mb-6 transition-all duration-300">
             <!-- Progress Bar -->
-            <div class="w-full bg-black/10 h-1.5 rounded-full mb-8 overflow-hidden">
+            <div class="w-full bg-black/10 dark:bg-black/30 h-1.5 rounded-full mb-8 overflow-hidden">
                 <div id="progress-bar" class="bg-white h-full transition-all duration-1000" style="width: 0%"></div>
             </div>
 
@@ -48,109 +61,118 @@
             <div id="timer-display" class="text-white text-8xl font-extrabold mb-8 tabular-nums">25:00</div>
 
             <!-- Controls -->
-            <div class="timer-controls">
+            <div class="flex items-center justify-center gap-4">
                 <button id="start-btn" class="bg-white text-gray-800 text-xl font-bold px-12 py-3 rounded-md shadow-lg hover:bg-gray-100 active:translate-y-1 transition-all uppercase tracking-wider">Start</button>
                 <button id="skip-btn" class="text-white opacity-80 hover:opacity-100 transition">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
                     </svg>
                 </button>
-                 <button id="rain-btn" class="glass text-white px-3 py-2 rounded">
-                🌧 Rain
-                </button>
-                
-                <button id="forest-btn" class="glass text-white px-3 py-2 rounded">
-                🌲 Forest
-                </button>
             </div>
-          
         </div>
 
         <!-- Task Section -->
         <div class="w-full">
             <div class="flex justify-between items-center border-b border-white/30 pb-3 mb-4">
-                <h2 class="text-white text-xl font-semibold">Tasks</h2>
-                <button id="add-task-btn" class="glass text-white p-2 rounded-full hover:bg-white/20 transition">+</button>
+                <h2 class="text-white text-xl font-semibold">Tasks (Select Active)</h2>
+                <button id="add-task-btn" class="glass text-white p-2 rounded-full hover:bg-white/20 transition w-10 h-10 flex items-center justify-center font-bold text-xl">+</button>
             </div>
             
             <div id="task-list" class="space-y-3">
                 <!-- Tasks will be injected here -->
             </div>
 
-            <!-- Add Task Input (Hidden by default) -->
-            <div id="task-input-container" class="mt-4 hidden">
-                <input type="text" id="task-input" placeholder="What are you working on?" class="w-full p-4 rounded-lg focus:outline-none shadow-inner">
-                <div class="flex justify-end gap-2 mt-2">
-                    <button id="cancel-task" class="text-white/70 px-4 py-2 hover:text-white">Cancel</button>
-                    <button id="save-task" class="bg-gray-800 text-white px-4 py-2 rounded shadow">Save</button>
+            <!-- Add Task Input -->
+            <div id="task-input-container" class="mt-4 hidden bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg transition-colors">
+                <input type="text" id="task-input" placeholder="What are you working on?" class="w-full p-3 rounded-lg focus:outline-none bg-gray-100 dark:bg-gray-700 dark:text-white mb-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-600 dark:text-gray-300 font-semibold">Est. Pomodoros:</label>
+                        <input type="number" id="task-est" value="1" min="1" class="w-16 p-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white text-center">
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="cancel-task" class="text-gray-500 dark:text-gray-400 px-4 py-2 hover:text-black dark:hover:text-white">Cancel</button>
+                        <button id="save-task" class="bg-gray-800 dark:bg-blue-600 text-white px-4 py-2 rounded shadow">Save</button>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Productivity Dashboard -->
-<div class="glass rounded-xl p-6 mt-8 text-white">
-    <h2 class="text-xl font-bold mb-4">Productivity Stats</h2>
-
-    <div class="grid grid-cols-3 gap-4 text-center mb-6">
-        <div>
-            <div id="sessions-today" class="text-2xl font-bold">0</div>
-            <div class="text-xs opacity-70">Sessions Today</div>
-        </div>
-
-        <div>
-            <div id="focus-streak" class="text-2xl font-bold">0</div>
-            <div class="text-xs opacity-70">Day Streak 🔥</div>
-        </div>
-
-        <div>
-            <div id="productivity-score" class="text-2xl font-bold">0</div>
-            <div class="text-xs opacity-70">Score</div>
-        </div>
-    </div>
-
-    <canvas id="focusChart" height="100"></canvas>
-</div>
-        
     </main>
 
     <!-- Modals -->
+
+    <!-- Stats Modal -->
+    <div id="stats-modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-900 dark:text-white rounded-xl p-8 w-[90%] max-w-lg shadow-2xl transition-colors max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Your Productivity</h3>
+                <button id="close-stats" class="text-gray-500 hover:text-red-500 text-xl font-bold">✕</button>
+            </div>
+            
+            <!-- Key Metrics -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Productivity Score</p>
+                    <p id="stat-score" class="text-3xl font-black text-blue-500">0</p>
+                </div>
+                <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Current Streak</p>
+                    <p id="stat-streak" class="text-3xl font-black text-orange-500">0 🔥</p>
+                </div>
+                <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Pomos Today</p>
+                    <p id="stat-pomos" class="text-2xl font-bold">0</p>
+                </div>
+                <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg text-center">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Focus Time Today</p>
+                    <p id="stat-time" class="text-2xl font-bold">0h 0m</p>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="mb-4">
+                <canvas id="productivityChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
     <!-- Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-8 w-80 shadow-2xl">
+    <div id="settings-modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-900 dark:text-white rounded-xl p-8 w-80 shadow-2xl transition-colors">
             <h3 class="text-xl font-bold mb-4">Timer Settings</h3>
             <div class="space-y-4">
                 <div>
-                    <label class="text-sm font-semibold text-gray-500">Pomodoro (min)</label>
-                    <input type="number" id="pomo-duration" value="25" class="w-full bg-gray-100 p-2 rounded">
+                    <label class="text-sm font-semibold text-gray-500 dark:text-gray-400">Pomodoro (min)</label>
+                    <input type="number" id="pomo-duration" value="25" class="w-full bg-gray-100 dark:bg-gray-800 p-2 rounded outline-none mt-1">
                 </div>
                 <div>
-                    <label class="text-sm font-semibold text-gray-500">Short Break (min)</label>
-                    <input type="number" id="short-duration" value="5" class="w-full bg-gray-100 p-2 rounded">
+                    <label class="text-sm font-semibold text-gray-500 dark:text-gray-400">Short Break (min)</label>
+                    <input type="number" id="short-duration" value="5" class="w-full bg-gray-100 dark:bg-gray-800 p-2 rounded outline-none mt-1">
                 </div>
                 <div>
-                    <label class="text-sm font-semibold text-gray-500">Long Break (min)</label>
-                    <input type="number" id="long-duration" value="15" class="w-full bg-gray-100 p-2 rounded">
+                    <label class="text-sm font-semibold text-gray-500 dark:text-gray-400">Long Break (min)</label>
+                    <input type="number" id="long-duration" value="15" class="w-full bg-gray-100 dark:bg-gray-800 p-2 rounded outline-none mt-1">
                 </div>
             </div>
-            <button id="close-settings" class="w-full bg-red-500 text-white mt-6 py-2 rounded font-bold">Close & Save</button>
+            <button id="close-settings" class="w-full bg-red-500 hover:bg-red-600 text-white mt-6 py-2 rounded font-bold transition">Close & Save</button>
         </div>
     </div>
 
     <!-- Personalize Modal -->
-    <div id="personalize-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-8 w-96 shadow-2xl">
-            <h3 class="text-xl font-bold mb-4">Custom Background</h3>
-            <p class="text-sm text-gray-600 mb-4">Upload an image or paste a URL to personalize your workspace.</p>
+    <div id="personalize-modal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-900 dark:text-white rounded-xl p-8 w-96 shadow-2xl transition-colors">
+            <h3 class="text-xl font-bold mb-2">Custom Background</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Upload an image or paste a URL to personalize your workspace.</p>
             
             <div class="space-y-4">
-                <input type="text" id="bg-url-input" placeholder="Paste Image URL" class="w-full border p-2 rounded">
+                <input type="text" id="bg-url-input" placeholder="Paste Image URL" class="w-full border dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-2 rounded outline-none">
                 <div class="text-center text-xs font-bold text-gray-400">OR</div>
                 <input type="file" id="bg-file-input" accept="image/*" class="w-full text-sm">
             </div>
             
             <div class="flex gap-2 mt-6">
-                <button id="reset-bg" class="flex-1 bg-gray-200 py-2 rounded font-semibold">Reset</button>
-                <button id="close-personalize" class="flex-1 bg-gray-800 text-white py-2 rounded font-semibold">Done</button>
+                <button id="reset-bg" class="flex-1 bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 py-2 rounded font-semibold transition">Reset</button>
+                <button id="close-personalize" class="flex-1 bg-gray-800 dark:bg-blue-600 text-white py-2 rounded font-semibold transition">Done</button>
             </div>
         </div>
     </div>
@@ -158,24 +180,12 @@
     <!-- Audio Elements -->
     <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
     <audio id="finish-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
-    <audio id="rain-sound" loop>
-  <source src="https://assets.mixkit.co/sfx/preview/mixkit-light-rain-loop-2393.mp3">
-</audio>
-
-<audio id="forest-sound" loop>
-  <source src="https://assets.mixkit.co/sfx/preview/mixkit-forest-stream-ambience-loop-1234.mp3">
-</audio>
-
- 
-<!-- Confetti CDN -->
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Ambient Audio Sources -->
+    <audio id="ambient-rain" loop src="https://cdn.pixabay.com/download/audio/2021/08/09/audio_82c035661b.mp3?filename=heavy-rain-nature-sounds-8186.mp3"></audio>
+    <audio id="ambient-forest" loop src="https://cdn.pixabay.com/download/audio/2021/08/09/audio_d0a1b64cf6.mp3?filename=forest-with-small-river-birds-and-nature-field-recording-6735.mp3"></audio>
+    <audio id="ambient-cafe" loop src="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d14f9da7b3.mp3?filename=coffee-shop-ambience-17684.mp3"></audio>
+
     <script src="script.js"></script>
 </body>
-
 </html>
-
-
-
-
