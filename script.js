@@ -325,7 +325,34 @@ function saveSettings() {
         
         });
 
+        // Focus sounds
+const rainSound = document.getElementById("rain-sound");
+const forestSound = document.getElementById("forest-sound");
+
+document.getElementById("rain-btn").addEventListener("click", () => {
+
+if(rainSound.paused){
+forestSound.pause();
+rainSound.play();
+}else{
+rainSound.pause();
+}
+
+});
+
+document.getElementById("forest-btn").addEventListener("click", () => {
+
+if(forestSound.paused){
+rainSound.pause();
+forestSound.play();
+}else{
+forestSound.pause();
+}
+
+});
+
 init();
+
 
 
 
