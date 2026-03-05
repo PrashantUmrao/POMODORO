@@ -26,6 +26,7 @@
             <button id="personalize-btn" class="glass text-white px-4 py-2 rounded-md text-sm hover:bg-white/30 transition">Personalize</button>
             <button id="settings-btn" class="glass text-white px-4 py-2 rounded-md text-sm hover:bg-white/30 transition">Settings</button>
         </div>
+        <button id="theme-toggle" class="glass text-white px-4 py-2 rounded-md text-sm">Theme</button>
     </header>
 
     <main class="w-full max-w-xl z-10">
@@ -55,6 +56,9 @@
                     </svg>
                 </button>
             </div>
+            <button id="sound-toggle" class="glass text-white px-3 py-2 rounded">
+            🌧 Focus Sound
+            </button>
         </div>
 
         <!-- Task Section -->
@@ -77,6 +81,30 @@
                 </div>
             </div>
         </div>
+
+        <!-- Productivity Dashboard -->
+<div class="glass rounded-xl p-6 mt-8 text-white">
+    <h2 class="text-xl font-bold mb-4">Productivity Stats</h2>
+
+    <div class="grid grid-cols-3 gap-4 text-center mb-6">
+        <div>
+            <div id="sessions-today" class="text-2xl font-bold">0</div>
+            <div class="text-xs opacity-70">Sessions Today</div>
+        </div>
+
+        <div>
+            <div id="focus-streak" class="text-2xl font-bold">0</div>
+            <div class="text-xs opacity-70">Day Streak 🔥</div>
+        </div>
+
+        <div>
+            <div id="productivity-score" class="text-2xl font-bold">0</div>
+            <div class="text-xs opacity-70">Score</div>
+        </div>
+    </div>
+
+    <canvas id="focusChart" height="100"></canvas>
+</div>
         
     </main>
 
@@ -125,14 +153,19 @@
     <!-- Audio Elements -->
     <audio id="click-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
     <audio id="finish-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3"></audio>
+    <audio id="rain-sound" loop>
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-light-rain-loop-2393.mp3">
+</audio>
 
  
 <!-- Confetti CDN -->
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 
 </html>
+
 
 
